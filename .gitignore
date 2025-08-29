@@ -205,3 +205,26 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# 操作系统相关文件
+.DS_Store
+Thumbs.db
+
+# 编辑器和IDE配置文件
+.idea/
+*.iml
+*.iws
+*.ipr
+*.vscode/
+
+# Word文档临时文件
+~$*.docx
+*.tmp
+*.temp
+*~.doc
+
+# 日志和编译文件
+*.pyc
+
+# 你的Claude聊天记录文件
+claude.md
