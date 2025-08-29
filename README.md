@@ -1,4 +1,4 @@
-# Animeko Python Web Scraper
+# AnimeScraper-Py
 
 A Python port of the Kotlin web scraper from the Animeko project, maintaining identical functionality for CSS-based web parsing, three-step scraping flow, and configurable selector rules.
 
