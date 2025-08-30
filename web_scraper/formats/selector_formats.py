@@ -11,6 +11,7 @@ from typing import List, Optional, Dict, Any
 from bs4 import BeautifulSoup
 from pyquery import PyQuery as pq
 from urllib.parse import urljoin
+from ..utils.logger import logger
 
 from ..models import WebSearchSubjectInfo, WebSearchEpisodeInfo, EpisodeSort
 from ..utils import parse_episode_number
@@ -120,7 +121,7 @@ class SelectorSubjectFormatA(SelectorSubjectFormat):
             return subjects
             
         except Exception as e:
-            print(f"Error in SelectorSubjectFormatA.select: {e}")
+            logger.error(f"SelectorSubjectFormatA.select 中出错: {e}")
             return []
 
 
@@ -188,7 +189,7 @@ class SelectorSubjectFormatIndexed(SelectorSubjectFormat):
             return subjects
             
         except Exception as e:
-            print(f"Error in SelectorSubjectFormatIndexed.select: {e}")
+            logger.error(f"SelectorSubjectFormatIndexed.select 中出错: {e}")
             return []
 
 
@@ -254,7 +255,7 @@ class SelectorChannelFormatNoChannel(SelectorChannelFormat):
             return episodes
             
         except Exception as e:
-            print(f"Error in SelectorChannelFormatNoChannel.select: {e}")
+            logger.error(f"SelectorChannelFormatNoChannel.select 中出错: {e}")
             return []
 
 
@@ -339,7 +340,7 @@ class SelectorChannelFormatIndexGrouped(SelectorChannelFormat):
             return episodes
             
         except Exception as e:
-            print(f"Error in SelectorChannelFormatIndexGrouped.select: {e}")
+            logger.error(f"SelectorChannelFormatIndexGrouped.select 中出错: {e}")
             return []
 
 

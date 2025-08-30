@@ -11,6 +11,7 @@ This example demonstrates how to:
 import asyncio
 import sys
 import os
+from web_scraper.utils.logger import logger
 
 # Add the web_scraper package to the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -55,13 +56,13 @@ def create_example_config() -> SelectorSearchConfig:
 
 async def test_selector_media_source():
     """Test the SelectorMediaSource with example configuration"""
-    print("=== Testing SelectorMediaSource ===")
+    logger.info("正在测试 SelectorMediaSource")
     
     config = create_example_config()
     source = SelectorMediaSource("example-source", config)
     
     # Check connection (will fail since it's an example URL)
-    print(f"Connection status: {source.check_connection()}")
+    logger.info(f"连接状态: {source.check_connection()}")
     
     # Create a fetch request
     request = MediaFetchRequest(
@@ -70,21 +71,21 @@ async def test_selector_media_source():
         episode_name="第1集"
     )
     
-    print(f"Created fetch request for: {request.subject_names}")
-    print(f"Source info: {source.info}")
+    logger.info(f"为以下主题创建了查询请求: {request.subject_names}")
+    logger.info(f"源信息: {source.info}")
     
     # Note: This would fail with the example URL, but shows the API
     try:
         matches = list(source.fetch(request))
-        print(f"Found {len(matches)} matches")
+        logger.success(f"找到 {len(matches)} 个匹配结果")
         
         for i, match in enumerate(matches[:3]):  # Show first 3
-            print(f"  Match {i+1}: {match.media.original_title}")
-            print(f"    URL: {match.media.download.url}")
-            print(f"    Episode: {match.media.episode_range}")
+            logger.info(f"  匹配 {i+1}: {match.media.original_title}")
+            logger.info(f"    URL: {match.media.download.url}")
+            logger.info(f"    剧集: {match.media.episode_range}")
             
     except Exception as e:
-        print(f"Expected error (example URL): {e}")
+        logger.warning(f"预期错误（示例 URL）: {e}")
 
 
 class ExampleThreeStepSource(ThreeStepWebMediaSource):
@@ -121,7 +122,7 @@ class ExampleThreeStepSource(ThreeStepWebMediaSource):
         """Search implementation - returns demo data"""
         from web_scraper.models import Bangumi
         
-        print(f"Searching for: {name}")
+        logger.info(f"正在搜索: {name}")
         
         # Return demo bangumi for testing
         return [
@@ -166,7 +167,7 @@ class ExampleThreeStepSource(ThreeStepWebMediaSource):
 
 async def test_three_step_source():
     """Test the ThreeStepWebMediaSource with example implementation"""
-    print("\n=== Testing ThreeStepWebMediaSource ===")
+    logger.info("正在测试 ThreeStepWebMediaSource")
     
     source = ExampleThreeStepSource(
         media_source_id="demo-three-step",
@@ -179,24 +180,24 @@ async def test_three_step_source():
         episode_sort=EpisodeSort(1)
     )
     
-    print(f"Three-step source info:")
-    print(f"  Media Source ID: {source.media_source_id}")
-    print(f"  Base URL: {source.base_url}")
-    print(f"  Connection: {source.check_connection()}")
+    logger.info(f"三步源信息:")
+    logger.info(f"  媒体源 ID: {source.media_source_id}")
+    logger.info(f"  基本 URL: {source.base_url}")
+    logger.info(f"  连接: {source.check_connection()}")
     
     # Test search functionality
     bangumi_list = await source.search("进击的巨人", request)
-    print(f"\nFound {len(bangumi_list)} anime:")
+    logger.success(f"找到 {len(bangumi_list)} 个动漯:")
     for bangumi in bangumi_list:
-        print(f"  - {bangumi.name} ({bangumi.internal_id})")
+        logger.info(f"  - {bangumi.name} ({bangumi.internal_id})")
     
     # Note: Full fetch would require actual HTML content
-    print("\nThree-step pattern demonstrated successfully!")
+    logger.success("三步模式演示成功！")
 
 
 def demonstrate_configuration():
     """Demonstrate various configuration options"""
-    print("\n=== Configuration Examples ===")
+    logger.info("配置示例")
     
     # Basic configuration
     basic_config = SelectorSearchConfig(
@@ -208,10 +209,10 @@ def demonstrate_configuration():
         )
     )
     
-    print("Basic configuration created:")
-    print(f"  Search URL: {basic_config.search_url}")
-    print(f"  Base URL: {basic_config.final_base_url}")
-    print(f"  Request interval: {basic_config.request_interval_seconds}s")
+    logger.info("基本配置已创建:")
+    logger.info(f"  搜索 URL: {basic_config.search_url}")
+    logger.info(f"  基本 URL: {basic_config.final_base_url}")
+    logger.info(f"  请求间隔: {basic_config.request_interval_seconds}秒")
     
     # Advanced configuration
     advanced_config = SelectorSearchConfig(
@@ -241,16 +242,16 @@ def demonstrate_configuration():
         )
     )
     
-    print("\nAdvanced configuration features:")
-    print(f"  Multiple subject names: {advanced_config.search_use_subject_names_count}")
-    print(f"  Player restrictions: {advanced_config.only_supports_players}")
-    print(f"  Video URL regex: {advanced_config.match_video.match_video_url}")
+    logger.info("高级配置功能:")
+    logger.info(f"  多个主题名称: {advanced_config.search_use_subject_names_count}")
+    logger.info(f"  播放器限制: {advanced_config.only_supports_players}")
+    logger.info(f"  视频 URL 正则: {advanced_config.match_video.match_video_url}")
 
 
 async def main():
     """Main demo function"""
-    print("* Animeko Python Web Scraper Demo")
-    print("=" * 50)
+    logger.info("* Animeko Python 网页爬虫演示")
+    logger.info("=" * 50)
     
     # Test basic functionality
     await test_selector_media_source()
@@ -259,12 +260,12 @@ async def main():
     # Show configuration options
     demonstrate_configuration()
     
-    print("\n[OK] Demo completed successfully!")
-    print("\nNext steps:")
-    print("1. Customize the CSS selectors for your target site")
-    print("2. Configure video URL matching patterns")
-    print("3. Add error handling and logging")
-    print("4. Implement rate limiting and caching")
+    logger.success("演示成功完成！")
+    logger.info("下一步:")
+    logger.info("1. 为目标网站自定义 CSS 选择器")
+    logger.info("2. 配置视频 URL 匹配模式")
+    logger.info("3. 添加错误处理和日志")
+    logger.info("4. 实现限速和缓存")
 
 
 if __name__ == "__main__":

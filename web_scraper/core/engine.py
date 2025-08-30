@@ -14,6 +14,7 @@ from urllib.parse import urljoin, urlparse, quote_plus
 import requests
 from bs4 import BeautifulSoup, Tag
 from pyquery import PyQuery as pq
+from ..utils.logger import logger
 
 from ..models import (
     WebSearchSubjectInfo, WebSearchEpisodeInfo, SelectorSearchQuery,
@@ -148,7 +149,7 @@ class SelectorMediaSourceEngine:
             return subjects
             
         except Exception as e:
-            print(f"Error selecting subjects: {e}")
+            logger.error(f"选择主题时出错: {e}")
             return []
     
     def search_episodes(self, subject_details_page_url: str) -> Optional[BeautifulSoup]:
@@ -231,7 +232,7 @@ class SelectorMediaSourceEngine:
             return episodes
             
         except Exception as e:
-            print(f"Error selecting episodes: {e}")
+            logger.error(f"选择剧集时出错: {e}")
             return []
     
     def _parse_episode_sort(self, name: str) -> Optional[EpisodeSort]:

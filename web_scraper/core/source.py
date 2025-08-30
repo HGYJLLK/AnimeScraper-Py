@@ -8,6 +8,7 @@ import time
 import asyncio
 from typing import List, Optional, Iterator, Dict, Any
 import requests
+from ..utils.logger import logger
 
 from ..models import (
     SelectorSearchConfig, MediaFetchRequest, MediaMatch, Media,
@@ -97,7 +98,7 @@ class SelectorMediaSource:
         await self._delay_until_next_allowed_search()
         
         if not self._check_player_support():
-            print(f"Player not supported. Supported: {self.config.only_supports_players}")
+            logger.warning(f"播放器不受支持。支持的播放器: {self.config.only_supports_players}")
             return []
         
         try:
@@ -143,13 +144,13 @@ class SelectorMediaSource:
                     all_media.extend(media_list)
                     
                 except Exception as e:
-                    print(f"Error processing subject {subject_info.name}: {e}")
+                    logger.error(f"处理主题 {subject_info.name} 时出错: {e}")
                     continue
             
             return all_media
             
         except Exception as e:
-            print(f"Search error: {e}")
+            logger.error(f"搜索错误: {e}")
             return []
     
     def fetch(self, query: MediaFetchRequest) -> Iterator[MediaMatch]:

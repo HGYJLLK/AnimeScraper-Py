@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Iterator
 import requests
 from bs4 import BeautifulSoup
+from ..utils.logger import logger
 
 from ..models import (
     Bangumi, Episode, MediaFetchRequest, MediaMatch, Media,
@@ -116,7 +117,7 @@ class ThreeStepWebMediaSource(ABC):
             response = self.session.get(self.base_url, timeout=10)
             return "SUCCESS" if response.status_code == 200 else "FAILED"
         except Exception as e:
-            print(f"Connection check failed for {self.media_source_id}: {e}")
+            logger.error(f"连接检查失败 {self.media_source_id}: {e}")
             return "FAILED"
     
     async def fetch(self, query: MediaFetchRequest) -> Iterator[MediaMatch]:
@@ -151,15 +152,15 @@ class ThreeStepWebMediaSource(ABC):
                                 self._is_possibly_movie(match.media.original_title)):
                                 all_matches.append(match)
                         
-                        print(f"{self.media_source_id} fetched {len(episodes)} episodes for '{subject_name}': "
+                        logger.info(f"{self.media_source_id} 为 '{subject_name}' 获取了 {len(episodes)} 集: "
                               f"{[ep.name for ep in episodes[:5]]}")  # Show first 5
                         
                     except Exception as e:
-                        print(f"Error getting episodes for {bangumi.name}: {e}")
+                        logger.error(f"获取 {bangumi.name} 的剧集时出错: {e}")
                         continue
                         
             except Exception as e:
-                print(f"Error searching for '{subject_name}': {e}")
+                logger.error(f"搜索 '{subject_name}' 时出错: {e}")
                 continue
         
         return iter(all_matches)
@@ -170,7 +171,7 @@ class ThreeStepWebMediaSource(ABC):
             try:
                 return await self.search(name, query)
             except Exception as e:
-                print(f"Search attempt {attempt + 1} failed for '{name}': {e}")
+                logger.warning(f"第 {attempt + 1} 次搜索 '{name}' 失败: {e}")
                 if attempt < retries - 1:
                     await self._async_sleep(1.0)  # Wait before retry
                 else:
@@ -187,7 +188,7 @@ class ThreeStepWebMediaSource(ABC):
                 return self.parse_episode_list(document)
                 
             except Exception as e:
-                print(f"Episode fetch attempt {attempt + 1} failed for {bangumi.name}: {e}")
+                logger.warning(f"第 {attempt + 1} 次获取 {bangumi.name} 剧集失败: {e}")
                 if attempt < retries - 1:
                     await self._async_sleep(1.0)  # Wait before retry
                 else:
@@ -247,7 +248,7 @@ class SimpleThreeStepWebMediaSource(ThreeStepWebMediaSource):
                 ))
                 
             except Exception as e:
-                print(f"Error parsing bangumi item: {e}")
+                logger.error(f"解析动漫项目时出错: {e}")
                 continue
         
         return bangumi_list
@@ -267,7 +268,7 @@ class SimpleThreeStepWebMediaSource(ThreeStepWebMediaSource):
             return self.parse_bangumi_search(document)
             
         except Exception as e:
-            print(f"Search failed for '{name}': {e}")
+            logger.error(f"搜索 '{name}' 失败: {e}")
             return []
     
     def parse_episode_list(self, document: BeautifulSoup) -> List[Episode]:
@@ -309,7 +310,7 @@ class SimpleThreeStepWebMediaSource(ThreeStepWebMediaSource):
                 ))
                 
             except Exception as e:
-                print(f"Error parsing episode item: {e}")
+                logger.error(f"解析剧集项目时出错: {e}")
                 continue
         
         return episodes

@@ -5,41 +5,42 @@ Simple test runner for the Python web scraper implementation.
 
 import sys
 import os
+from web_scraper.utils.logger import logger
 
 # Add the web_scraper package to the Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
 def test_imports():
     """Test that all modules can be imported successfully"""
-    print("Testing imports...")
+    logger.info("正在测试导入...")
     
     try:
         from web_scraper.core import SelectorMediaSource, SelectorMediaSourceEngine
-        print("  [OK] Core classes imported")
+        logger.success("  核心类导入成功")
         
         from web_scraper.models import (
             SelectorSearchConfig, MediaFetchRequest, EpisodeSort,
             SelectorSubjectFormatConfig, SelectorChannelFormatConfig
         )
-        print("  [OK] Model classes imported")
+        logger.success("  模型类导入成功")
         
         from web_scraper.utils import helpers, filters
-        print("  [OK] Utility modules imported")
+        logger.success("  工具模块导入成功")
         
         from web_scraper.formats.selector_formats import (
             SelectorSubjectFormatA, SelectorChannelFormatNoChannel
         )
-        print("  [OK] Format classes imported")
+        logger.success("  格式类导入成功")
         
         return True
         
     except ImportError as e:
-        print(f"  [ERROR] Import error: {e}")
+        logger.error(f"  导入错误: {e}")
         return False
 
 def test_configuration():
     """Test configuration creation and validation"""
-    print("\nTesting configuration...")
+    logger.info("正在测试配置...")
     
     try:
         from web_scraper.models import SelectorSearchConfig
@@ -60,20 +61,20 @@ def test_configuration():
             )
         )
         
-        print(f"  [OK] Configuration created: {config.search_url}")
-        print(f"  [OK] Base URL: {config.final_base_url}")
-        print(f"  [OK] Subject format valid: {config.subject_format_config.is_valid()}")
-        print(f"  [OK] Channel format valid: {config.channel_format_config.is_valid()}")
+        logger.success(f"  配置创建成功: {config.search_url}")
+        logger.success(f"  基本 URL: {config.final_base_url}")
+        logger.success(f"  主题格式有效: {config.subject_format_config.is_valid()}")
+        logger.success(f"  频道格式有效: {config.channel_format_config.is_valid()}")
         
         return True
         
     except Exception as e:
-        print(f"  [ERROR] Configuration error: {e}")
+        logger.error(f"  配置错误: {e}")
         return False
 
 def test_media_source():
     """Test SelectorMediaSource creation"""
-    print("\nTesting media source...")
+    logger.info("正在测试媒体源...")
     
     try:
         from web_scraper.core import SelectorMediaSource
@@ -96,22 +97,22 @@ def test_media_source():
         
         source = SelectorMediaSource("test-source", config)
         
-        print(f"  [OK] Media source created: {source.media_source_id}")
-        print(f"  [OK] Info: {source.info}")
+        logger.success(f"  媒体源创建成功: {source.media_source_id}")
+        logger.success(f"  信息: {source.info}")
         
         # Test connection (will fail with example URL)
         connection_status = source.check_connection()
-        print(f"  [OK] Connection check: {connection_status}")
+        logger.success(f"  连接检查: {connection_status}")
         
         return True
         
     except Exception as e:
-        print(f"  [ERROR] Media source error: {e}")
+        logger.error(f"  媒体源错误: {e}")
         return False
 
 def test_utilities():
     """Test utility functions"""
-    print("\nTesting utilities...")
+    logger.info("正在测试工具...")
     
     try:
         from web_scraper.utils.helpers import (
@@ -121,30 +122,30 @@ def test_utilities():
         
         # Test episode parsing
         episode_num = parse_episode_number("第12集")
-        print(f"  [OK] Episode parsing: '第12集' → {episode_num}")
+        logger.success(f"  剧集解析: '第12集' → {episode_num}")
         
         # Test keyword extraction
         keyword = get_search_keyword("进击的巨人 Season 2", remove_special=True, use_only_first_word=True)
-        print(f"  [OK] Keyword extraction: '{keyword}'")
+        logger.success(f"  关键词提取: '{keyword}'")
         
         # Test quality extraction
         quality = extract_quality_info("Attack on Titan 1080P")
-        print(f"  [OK] Quality extraction: {quality}")
+        logger.success(f"  质量提取: {quality}")
         
         # Test language extraction
         lang = extract_subtitle_language("简体中文版")
-        print(f"  [OK] Language extraction: {lang}")
+        logger.success(f"  语言提取: {lang}")
         
         return True
         
     except Exception as e:
-        print(f"  [ERROR] Utilities error: {e}")
+        logger.error(f"  工具错误: {e}")
         return False
 
 def main():
     """Main test runner"""
-    print("Animeko Python Web Scraper - Test Runner")
-    print("=" * 50)
+    logger.info("Animeko Python 网页爬虫 - 测试运行器")
+    logger.info("=" * 50)
     
     tests = [
         test_imports,
@@ -160,16 +161,16 @@ def main():
         if test():
             passed += 1
     
-    print(f"\nTest Results: {passed}/{total} tests passed")
+    logger.info(f"测试结果: {passed}/{total} 个测试通过")
     
     if passed == total:
-        print("All tests passed! The Python web scraper is ready to use.")
-        print("\nNext steps:")
-        print("1. Customize CSS selectors for your target website")
-        print("2. Configure video URL matching patterns")
-        print("3. Test with real anime sites")
+        logger.success("所有测试通过！Python 网页爬虫已准备好可以使用。")
+        logger.info("下一步:")
+        logger.info("1. 为目标网站自定义 CSS 选择器")
+        logger.info("2. 配置视频 URL 匹配模式")
+        logger.info("3. 使用真实动漫网站进行测试")
     else:
-        print("Some tests failed. Please check the implementation.")
+        logger.error("一些测试失败。请检查实现。")
         return 1
     
     return 0
